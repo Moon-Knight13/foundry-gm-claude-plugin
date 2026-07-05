@@ -7,6 +7,5 @@
   "repository": "https://github.com/Moon-Knight13/foundry-gm-claude-plugin",
   "license": "MIT",
   "keywords": ["foundryvtt", "foundry-vtt", "dnd5e", "game-master", "compendium", "content-as-code", "mcp"],
-  "hooks": "./hooks/hooks.json",
-  "agents": ["./agents"]
+  "hooks": "./hooks/hooks.json"
 }
