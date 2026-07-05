@@ -27,9 +27,9 @@ jobs:
         run: |
           curl -fsSL -o /tmp/marketplace.schema.json https://json.schemastore.org/claude-code-marketplace.json
           curl -fsSL -o /tmp/plugin.schema.json https://json.schemastore.org/claude-code-plugin-manifest.json
-          npx --yes ajv-cli@5 validate --spec=draft2020 -c ajv-formats \
+          npx --yes -p ajv-cli@5 -p ajv-formats@2 ajv validate --spec=draft2020 -c ajv-formats \
             -s /tmp/marketplace.schema.json -d .claude-plugin/marketplace.json
-          npx --yes ajv-cli@5 validate --spec=draft2020 -c ajv-formats \
+          npx --yes -p ajv-cli@5 -p ajv-formats@2 ajv validate --spec=draft2020 -c ajv-formats \
             -s /tmp/plugin.schema.json -d foundry-gm/.claude-plugin/plugin.json
 
       - name: Shellcheck plugin scripts
