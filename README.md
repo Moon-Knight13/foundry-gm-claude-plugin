@@ -1,70 +1,56 @@
-# Claude Secure Template
+# foundry-gm — Claude Code plugin for FoundryVTT game masters
 
-[![ci](https://github.com/Moon-Knight13/claude_template_repo/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Moon-Knight13/claude_template_repo/actions/workflows/ci.yml)
-[![semgrep](https://github.com/Moon-Knight13/claude_template_repo/actions/workflows/semgrep.yml/badge.svg?branch=main)](https://github.com/Moon-Knight13/claude_template_repo/actions/workflows/semgrep.yml)
-[![secret-scan](https://github.com/Moon-Knight13/claude_template_repo/actions/workflows/secret-scan.yml/badge.svg?branch=main)](https://github.com/Moon-Knight13/claude_template_repo/actions/workflows/secret-scan.yml)
+A Claude Code plugin marketplace with one plugin, **foundry-gm**: an AI
+game master toolkit for [Foundry Virtual Tabletop](https://foundryvtt.com).
 
-A language-agnostic, production-ready template for Claude-first development. Provides secure defaults, AI task routing, BMAD workflow integration, and deterministic CI gates so you can focus on your project rather than its scaffolding.
+## What the plugin does
 
-## What's Included
+- **`foundry-content` skill — content-as-code.** Author campaign content
+  (NPCs, items, quest journals, scenes, roll tables, factions, encounters)
+  as JSON files in your project repo and compile them into a Foundry
+  compendium module with deterministic IDs, validated `@UUID` cross-links,
+  and a host-side sync script. System-agnostic core, dnd5e first-class.
+  On first use it scaffolds the build tooling into your project
+  (`scripts/content/`), so your repo owns its dependencies.
+- **`foundry-mcp-setup` skill.** Install/troubleshooting guidance for the
+  [foundry-vtt-mcp](https://github.com/adambdooley/foundry-vtt-mcp) bridge
+  that lets Claude Code operate a live session (dice, tokens, conditions,
+  scenes) — including the known packaging gotchas.
+- **Routing guard (hook).** A PreToolUse hook denies the token-expensive
+  MCP content-creation tools and points to the content-as-code skill, so
+  bulk authoring never burns live-session tokens. Overridable per session
+  for genuine live one-offs.
+- **`foundry-content-reviewer` agent.** Read-only QA pass over your
+  `content/src/` documents before build and import.
 
-- **AI routing** — routes low-risk work to a local Ollama model; escalates to Claude for security, architecture, and cross-cutting changes
-- **Security gates** — gitleaks secret scanning, semgrep SAST (including MITRE ATLAS AI/ML rules), Trivy container scanning, all enforced in CI
-- **BMAD workflow** — structured product → engineering planning via the `/bmad` skill
-- **Kanban orchestration** — a per-repo GitHub Project board where a human orchestrator hands work to Claude sessions or local models; agents claim issues collision-free via `/next-issue` and `/run-epic` (see [docs/KANBAN_WORKFLOW.md](docs/KANBAN_WORKFLOW.md))
-- **Devcontainer** — deny-by-default network firewall, pre-installed tooling, Claude CLI with mounted auth volume
-- **Branch protection bootstrap** — one-command GitHub branch protection with required status checks
-- **Day-0 validation** — `/day0-check` walks you through every setup step with pass/fail output and remediation hints
-
-## Prerequisites
-
-- Docker + VS Code Dev Containers extension
-- Git with SSH access to GitHub
-- Claude Code CLI (authenticated before first session)
-- Optional: Ollama on host port 11434 for local model offload
-
-See [docs/TEMPLATE_GUIDE.md](docs/TEMPLATE_GUIDE.md) for the full setup guide including Caveman token compression and PII-Shield.
-
-## Quick Start
-
-1. **Use this template** — click "Use this template" on GitHub, or clone and re-init:
-   ```bash
-   git clone <this-repo> my-project && cd my-project && rm -rf .git && git init
-   ```
-
-2. **Open in devcontainer** — VS Code prompts to reopen; accept. The container installs all tooling automatically on start.
-
-3. **Complete day-0 setup** — two browser logins; everything else is applied automatically on container start:
-   ```bash
-   gh auth login --hostname github.com --git-protocol https --web -s project && gh auth setup-git
-   claude auth login
-   bash scripts/setup-day0.sh   # finishes the auth-gated bootstraps, prints status
-   ```
-   Verify anytime with `bash scripts/check-day0.sh` — or from Claude: `/day0-check`
-
-4. **Validate the template** — confirm all template integrity checks pass:
-   ```bash
-   bash scripts/validate-template.sh
-   ```
-
-## Repository Structure
+## Install
 
 ```
-.claude/commands/    Claude Code skills (/bmad, /bmad-to-board, /next-issue, /run-epic, /day0-check, /route-task, /security-audit, /firewall-allow)
-.devcontainer/       Dev environment with deny-by-default firewall and pre-installed tooling
-.github/             Workflows (CI, secret scan, semgrep, container scan, weekly audit); issue & PR templates
-docs/                TEMPLATE_GUIDE.md, AI_ROUTING_POLICY.md, BMAD_WORKFLOW.md, KANBAN_WORKFLOW.md
-scripts/             Bootstrap (incl. board), routing, CI helpers, and template validator
+/plugin marketplace add Moon-Knight13/foundry-gm-claude-plugin
+/plugin install foundry-gm@foundry-gm-marketplace
 ```
 
-## Deriving a New Project
+## Requirements
 
-When you start a new project from this template:
+- Node.js (the content build uses
+  [`@foundryvtt/foundryvtt-cli`](https://github.com/foundryvtt/foundryvtt-cli),
+  installed into your project on first scaffold)
+- A FoundryVTT server you administer (v12+, v13 recommended)
+- Optional, for live play: the foundry-vtt-mcp bridge module + server
 
-1. Replace this `README.md` with your project README — use [`docs/README.template.md`](docs/README.template.md) as a starting point.
-2. Add `scripts/ci/lint-*.sh` and `scripts/ci/test-*.sh` for your language stack (see `scripts/ci/README.md`).
-3. Do the two day-0 logins (quick start step 3) — `scripts/setup-day0.sh` then fills CODEOWNERS, copies configs, applies branch protection, and creates the Kanban board (see [docs/KANBAN_WORKFLOW.md](docs/KANBAN_WORKFLOW.md)).
+## Design notes
+
+- The build tooling is **scaffolded into your project**, not run from the
+  plugin cache — plugin updates never silently change your build. A
+  `TOOLING_VERSION` marker lets the skill offer upgrades explicitly.
+- No MCP server is bundled and the plugin makes no network calls; skills
+  are lazy-loaded, so idle context cost is a few description lines.
+- Compendium document IDs derive from source paths (sha256, first 16 hex
+  chars) — imports update instead of duplicating, and links survive
+  rebuilds.
 
 ## License
 
-Apache 2.0 — see [LICENSE](LICENSE).
+MIT. Not affiliated with Foundry Gaming, LLC; Foundry Virtual Tabletop is
+their trademark. dnd5e templates contain schema structure only — bring your
+own game content.
