@@ -8,7 +8,7 @@
       "name": "foundry-gm",
       "source": "./foundry-gm",
       "description": "AI game master toolkit for FoundryVTT: content-as-code compendium authoring (system-agnostic, dnd5e first-class), foundry-mcp bridge setup guidance, and token-cost routing guards.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "keywords": ["foundryvtt", "foundry-vtt", "dnd5e", "game-master", "compendium", "content-as-code", "mcp"],
       "category": "gamedev"
     }

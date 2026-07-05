@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1
+
+- Fix: drop the redundant `hooks` key from `plugin.json`. The standard
+  `hooks/hooks.json` path loads automatically, so referencing it in the
+  manifest caused a duplicate-hooks load error (`/doctor`). The routing
+  guard stays active via the auto-loaded file.
+
 ## 0.1.0
 
 - Initial release.
